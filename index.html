@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Web Browser</title>
+  <!-- Lucide Icon Library -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <style>
+    /* Reset and base */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0a0a0a;
+      color: #e0d4f7;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    /* Top bar styling */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      background-color: #2a003f;
+      padding: 8px 12px;
+      border-bottom: 1px solid #4b0082;
+      gap: 8px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .top-bar button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      background-color: #8000ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .top-bar button:hover {
+      background-color: #6200cc;
+    }
+    .top-bar button i {
+      width: 18px;
+      height: 18px;
+    }
+    .top-bar button.accessible-button {
+      outline-offset: 2px;
+    }
+    .top-bar input {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 14px;
+      border: 1px solid #a076ff;
+      border-radius: 4px;
+      background-color: #1a001f;
+      color: #e0d4f7;
+      transition: background-color 0.3s, color 0.3s;
+      min-width: 0; /* prevent overflow */
+    }
+    .top-bar input.incognito {
+      background-color: #111111 !important;
+      color: #cccccc !important;
+    }
+    /* Tab bar styling */
+    .tab-bar {
+      display: flex;
+      background: #1a001f;
+      border-bottom: 1px solid #8000ff;
+      overflow-x: auto;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .tab-bar button {
+      background: #8000ff;
+      color: white;
+      border: none;
+      margin-right: 4px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .tab-bar button.active {
+      background: #6200cc;
+    }
+    .menu-container {
+      position: relative;
+    }
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background-color: #1a001f;
+      border: 1px solid #8000ff;
+      border-radius: 4px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 999;
+      min-width: 180px;
+    }
+    .dropdown a {
+      display: block;
+      padding: 10px 14px;
+      color: #e0d4f7;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .dropdown a:hover {
+      background-color: #32004d;
+    }
+    .show {
+      display: block;
+    }
+    /* Tab button styling */
+    .tab-button {
+      background: #8000ff;
+      color: white;
+      border: none;
+      margin: 2px 4px 2px 0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .tab-button.active {
+      background: #6200cc;
+    }
+    .tab-button.incognito {
+      background: #000000;
+      color: #bbbbbb;
+      border: 1px solid #444444;
+    }
+    .tab-button.incognito.active {
+      background: #222222;
+      color: #ffffff;
+      border-color: #888888;
+    }
+    /* Webviews container */
+    #webviews {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: black;
+    }
+
+    #webviews webview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      visibility: hidden;
+    }
+
+    #webviews webview.active {
+      position: relative;
+      visibility: visible;
+    }
+    #webviews webview.incognito {
+      background-color: black !important;
+      color: white !important;
+      filter: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button onclick="goBack()" aria-label="Go Back" class="accessible-button"><i data-lucide="arrow-left"></i></button>
+    <button onclick="goForward()" aria-label="Go Forward" class="accessible-button"><i data-lucide="arrow-right"></i></button>
+    <button onclick="goHome()" aria-label="Go Home" class="accessible-button"><i data-lucide="home"></i></button>
+    <input id="url" type="text" placeholder="Enter URL..." aria-label="URL input" />
+    <button onclick="loadURL()" aria-label="Load URL" class="accessible-button"><i data-lucide="globe"></i></button>
+    <div class="menu-container">
+      <button onclick="toggleDropdown()" aria-label="Open Menu" class="accessible-button"><i data-lucide="more-vertical"></i></button>
+      <div id="dropdown" class="dropdown">
+        <a href="#" onclick="newTab(); return false;">New Tab</a>
+        <a href="#" onclick="newWindow(); return false;">New Window</a>
+        <a href="#" onclick="newIncognito(); return false;">New Incognito Window</a>
+        <a href="#" onclick="openSettings(); return false;">Settings</a>
+      </div>
+    </div>
+  </div>
+  <div id="tab-bar" class="tab-bar"></div>
+  <div id="webviews"></div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if(window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      let tabCount = 0;
+      const tabs = [];
+      const webviewsContainer = document.getElementById('webviews');
+      const tabBar = document.getElementById('tab-bar');
+      let currentTabId = null;
+
+      window.loadURL = () => {
+        const urlInput = document.getElementById('url');
+        let url = urlInput.value.trim();
+
+        if (!url) {
+          alert('Please enter a URL.');
+          return;
+        }
+        try {
+          if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+          }
+          const urlObj = new URL(url);
+          url = urlObj.href;
+        } catch(e) {
+          alert('Invalid URL entered.');
+          return;
+        }
+        const webview = document.getElementById(currentTabId);
+        if (webview) {
+          console.log('Loading URL:', url);
+          webview.src = url;
+        } else {
+          console.warn('No active webview to load URL');
+        }
+      };
+
+      document.getElementById('url').addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          window.loadURL();
+        }
+      });
+
+      function createNewTab(url = 'https://example.com') {
+        tabCount++;
+        const tabId = `tab-${tabCount}`;
+
+        const tabButton = document.createElement('button');
+        tabButton.textContent = `Tab ${tabCount}`;
+        tabButton.classList.add('tab-button');
+        tabButton.onclick = () => switchToTab(tabId);
+        tabBar.appendChild(tabButton);
+
+        const tabWebview = document.createElement('webview');
+        tabWebview.id = tabId;
+        tabWebview.setAttribute('webpreferences', 'contextIsolation');
+        tabWebview.src = url;
+        webviewsContainer.appendChild(tabWebview);
+        
+
+        const updateURLInput = e => {
+          if (tabId === currentTabId) {
+            const urlInput = document.getElementById('url');
+            if (urlInput) urlInput.value = e.url;
+          }
+        };
+        tabWebview.addEventListener('did-navigate', updateURLInput);
+        tabWebview.addEventListener('did-navigate-in-page', updateURLInput);
+
+        tabWebview.addEventListener('did-fail-load', event => {
+          console.error('Load failed:', event.errorCode, event.errorDescription, event.validatedURL);
+          if (tabId === currentTabId) {
+            alert('Page failed to load.');
+          }
+        });
+
+        tabs.push({ id: tabId, webview: tabWebview, button: tabButton, incognito: false });
+
+        switchToTab(tabId);
+      }
+
+      function createIncognitoTab(url = 'https://example.com') {
+        tabCount++;
+        const tabId = `tab-incognito-${tabCount}`;
+
+        const tabButton = document.createElement('button');
+        tabButton.textContent = `Incognito ${tabCount}`;
+        tabButton.classList.add('tab-button', 'incognito');
+        tabButton.onclick = () => switchToTab(tabId);
+        tabBar.appendChild(tabButton);
+
+        const tabWebview = document.createElement('webview');
+        tabWebview.id = tabId;
+        tabWebview.setAttribute('webpreferences', 'contextIsolation');
+        tabWebview.partition = `persist:incognito-${tabCount}`;
+        tabWebview.classList.add('incognito');
+        tabWebview.src = url;
+        webviewsContainer.appendChild(tabWebview);
+
+        const updateURLInput = e => {
+          if (tabId === currentTabId) {
+            const urlInput = document.getElementById('url');
+            if (urlInput) urlInput.value = e.url;
+          }
+        };
+        tabWebview.addEventListener('did-navigate', updateURLInput);
+        tabWebview.addEventListener('did-navigate-in-page', updateURLInput);
+
+        tabWebview.addEventListener('did-fail-load', event => {
+          console.error('Load failed:', event.errorCode, event.errorDescription, event.validatedURL);
+          if (tabId === currentTabId) {
+            alert('Page failed to load.');
+          }
+        });
+
+        tabs.push({ id: tabId, webview: tabWebview, button: tabButton, incognito: true });
+
+        switchToTab(tabId);
+      }
+
+      function switchToTab(tabId) {
+        if (tabId === currentTabId) return;
+        tabs.forEach(({ id, webview, button, incognito }) => {
+          if (id === tabId) {
+            currentTabId = id;
+            button.classList.add('active');
+            // Show and activate webview
+            webview.classList.add('active');
+            // Update url input
+            const urlInput = document.getElementById('url');
+            if (urlInput) {
+              urlInput.value = webview.getURL ? webview.getURL() : webview.src;
+              if (incognito) {
+                urlInput.classList.add('incognito');
+              } else {
+                urlInput.classList.remove('incognito');
+              }
+            }
+          } else {
+            button.classList.remove('active');
+            webview.classList.remove('active');
+          }
+        });
+      }
+
+      window.goBack = () => {
+        const webview = document.getElementById(currentTabId);
+        if (webview && typeof webview.canGoBack === 'function' && webview.canGoBack()) webview.goBack();
+      };
+
+      window.goForward = () => {
+        const webview = document.getElementById(currentTabId);
+        if (webview && typeof webview.canGoForward === 'function' && webview.canGoForward()) webview.goForward();
+      };
+
+      window.goHome = () => {
+        const webview = document.getElementById(currentTabId);
+        if (webview) webview.src = 'https://example.com';
+      };
+
+      window.toggleDropdown = () => {
+        document.getElementById('dropdown').classList.toggle('show');
+      };
+
+      window.newTab = () => {
+        createNewTab();
+        document.getElementById('dropdown').classList.remove('show');
+      };
+      window.newWindow = () => {
+        if(window.electronAPI && window.electronAPI.openNewWindow) {
+          window.electronAPI.openNewWindow();
+          document.getElementById('dropdown').classList.remove('show');
+        } else {
+          alert('New window function is not available.');
+        }
+      };
+
+      window.newIncognito = () => {
+        createIncognitoTab();
+        document.getElementById('dropdown').classList.remove('show');
+      };
+
+      window.openSettings = () => {
+        if(window.electronAPI && window.electronAPI.navigateTo) {
+          window.electronAPI.navigateTo('settings');
+          document.getElementById('dropdown').classList.remove('show');
+        } else {
+          alert('Settings function is not available.');
+        }
+      };
+
+      window.onclick = function (e) {
+        if (!e.target.closest('.menu-container')) {
+          document.getElementById('dropdown').classList.remove('show');
+        }
+      };
+
+      createNewTab();
+    });
+  </script>
+</body>
+</html>

@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Browser Settings</title>
-
   <!-- Lucide Icon Library -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
     :root {
       --bg-dark: #0a0a0a;
@@ -18,7 +16,6 @@
       --text-color-dark: #e0d4f7;
       --heading-color-dark: #a076ff;
       --border-color-dark: #4b0082;
-
       --bg-light: #f0f0f5;
       --bg-sidebar-light: #b399ff;
       --bg-sidebar-hover-light: #a280ff;
@@ -28,7 +25,6 @@
       --heading-color-light: #663399;
       --border-color-light: #7b55ff;
     }
-
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -39,12 +35,10 @@
       overflow: hidden;
       transition: background-color 0.3s, color 0.3s;
     }
-
     body.light-theme {
       background-color: var(--bg-light);
       color: var(--text-color-light);
     }
-
     .sidebar {
       width: 240px;
       background-color: var(--bg-sidebar-dark);
@@ -55,12 +49,10 @@
       user-select: none;
       transition: background-color 0.3s, border-color 0.3s;
     }
-
     body.light-theme .sidebar {
       background-color: var(--bg-sidebar-light);
       border-color: var(--border-color-light);
     }
-
     .sidebar h2 {
       padding: 20px 16px;
       font-size: 18px;
@@ -72,12 +64,10 @@
       border-bottom: 1px solid var(--border-color-dark);
       transition: background-color 0.3s, border-color 0.3s;
     }
-
     body.light-theme .sidebar h2 {
       background-color: #9978ff;
       border-color: var(--border-color-light);
     }
-
     /* Search input */
     .search-bar {
       margin: 12px 16px;
@@ -90,13 +80,11 @@
       outline: none;
       transition: background-color 0.3s, border-color 0.3s, color 0.3s;
     }
-
     body.light-theme .search-bar {
       background-color: var(--bg-content-light);
       border-color: var(--border-color-light);
       color: var(--text-color-light);
     }
-
     /* Sidebar buttons */
     .sidebar button {
       padding: 14px 20px;
@@ -112,40 +100,33 @@
       gap: 12px;
       transition: background-color 0.3s, color 0.3s;
     }
-
     body.light-theme .sidebar button {
       color: var(--text-color-light);
       border-bottom: 1px solid #a280ff;
     }
-
     .sidebar button:hover {
       background-color: var(--bg-sidebar-hover-dark);
       color: #a076ff;
     }
-
     body.light-theme .sidebar button:hover {
       background-color: var(--bg-sidebar-hover-light);
       color: #fff;
     }
-
     .sidebar button.active {
       background-color: var(--bg-sidebar-active-dark);
       color: #d0b3ff;
       font-weight: 700;
     }
-
     body.light-theme .sidebar button.active {
       background-color: var(--bg-sidebar-active-light);
       color: #fff;
     }
-
     .sidebar button svg {
       stroke: currentColor;
       width: 20px;
       height: 20px;
       flex-shrink: 0;
     }
-
     /* Content */
     .content {
       flex: 1;
@@ -154,23 +135,19 @@
       background-color: var(--bg-content-dark);
       transition: background-color 0.3s;
     }
-
     body.light-theme .content {
       background-color: var(--bg-content-light);
     }
-
     .section {
       opacity: 0;
       max-height: 0;
       overflow: hidden;
       transition: opacity 0.3s ease, max-height 0.3s ease;
     }
-
     .section.active {
       opacity: 1;
       max-height: 100vh; /* large enough to show content */
     }
-
     h3 {
       margin-top: 0;
       font-weight: 700;
@@ -179,11 +156,9 @@
       letter-spacing: 0.03em;
       transition: color 0.3s;
     }
-
     body.light-theme h3 {
       color: var(--heading-color-light);
     }
-
     p {
       font-size: 16px;
       line-height: 1.5;
@@ -191,24 +166,20 @@
       max-width: 600px;
       transition: color 0.3s;
     }
-
     body.light-theme p {
       color: #4b3b7b;
     }
-
     /* Form styling */
     form {
       margin-top: 20px;
       max-width: 600px;
     }
-
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
       color: inherit;
     }
-
     input[type="text"],
     select {
       width: 100%;
@@ -221,21 +192,18 @@
       font-size: 14px;
       transition: background-color 0.3s, border-color 0.3s, color 0.3s;
     }
-
     body.light-theme input[type="text"],
     body.light-theme select {
       background-color: var(--bg-content-light);
       border-color: var(--border-color-light);
       color: var(--text-color-light);
     }
-
     input[type="checkbox"] {
       transform: scale(1.2);
       margin-right: 8px;
       vertical-align: middle;
       cursor: pointer;
     }
-
     /* Dark/Light toggle switch styling */
     .toggle-switch {
       position: relative;
@@ -274,7 +242,6 @@
     input:checked + .slider:before {
       transform: translateX(24px);
     }
-
     /* Responsive */
     @media (max-width: 700px) {
       body {
@@ -316,7 +283,6 @@
   </style>
 </head>
 <body>
-
   <div class="sidebar" role="navigation" aria-label="Settings menu">
     <h2>Settings</h2>
     <input
@@ -348,8 +314,8 @@
     <button onclick="showSection('reset', this)">
       <i data-lucide="rotate-ccw"></i> Reset Settings
     </button>
+    <button onclick="goHome()">Back</button>
   </div>
-
   <main class="content" role="main">
     <section id="performance" class="section active" tabindex="0">
       <h3>Performance</h3>
@@ -357,12 +323,10 @@
       <form>
         <label for="hardware-acceleration">Enable Hardware Acceleration</label>
         <input type="checkbox" id="hardware-acceleration" name="hardware-acceleration" />
-
         <label for="memory-limit">Memory Usage Limit (MB)</label>
         <input type="text" id="memory-limit" name="memory-limit" placeholder="e.g. 2048" pattern="\d*" />
       </form>
     </section>
-
     <section id="search" class="section" tabindex="0">
       <h3>Search Engine</h3>
       <p>Choose your default search engine.</p>
@@ -376,7 +340,6 @@
         </select>
       </form>
     </section>
-
     <section id="appearance" class="section" tabindex="0">
       <h3>Appearance</h3>
       <p>Change theme, font size, and other visuals.</p>
@@ -386,7 +349,6 @@
           <input type="checkbox" id="theme-toggle" aria-checked="false" aria-label="Toggle dark or light theme">
           <span class="slider"></span>
         </label>
-
         <label for="font-size">Font Size</label>
         <select id="font-size" name="font-size">
           <option value="small">Small</option>
@@ -395,7 +357,6 @@
         </select>
       </form>
     </section>
-
     <section id="languages" class="section" tabindex="0">
       <h3>Languages</h3>
       <p>Select your preferred language.</p>
@@ -410,21 +371,18 @@
         </select>
       </form>
     </section>
-
     <section id="downloads" class="section" tabindex="0">
       <h3>Downloads</h3>
       <p>Manage download location and behavior.</p>
       <form>
         <label for="download-location">Download Location</label>
-        <input type="text" id="download-location" name="download-location" placeholder="e.g. C:\Users\You\Downloads" />
-
+        <input type="text" id="download-location" name="download-location" placeholder="e.g. C:\users\You\Downloads" />
         <label>
           <input type="checkbox" id="ask-location" name="ask-location" />
           Always ask where to save files
         </label>
       </form>
     </section>
-
     <section id="system" class="section" tabindex="0">
       <h3>System</h3>
       <p>Control hardware acceleration and background processes.</p>
@@ -435,25 +393,21 @@
         </label>
       </form>
     </section>
-
     <section id="reset" class="section" tabindex="0">
       <h3>Reset Settings</h3>
       <p>Reset all browser settings to their default values.</p>
       <button onclick="resetSettings()">Reset to Defaults</button>
     </section>
   </main>
-
   <script>
     // Show/hide sections & update active button
     function showSection(id, button) {
       document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-
       document.querySelectorAll('.sidebar button').forEach(btn => {
         btn.classList.remove('active');
         btn.removeAttribute('aria-current');
       });
-
       button.classList.add('active');
       button.setAttribute('aria-current', 'page');
     }
@@ -496,7 +450,55 @@
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
     });
-  </script>
 
+    // Add the ipcRenderer part for navigation
+    const { ipcRenderer } = require('electron');
+
+    function goHome() {
+      window.electronAPI.navigateTo('home');
+    }
+
+
+    function goForward() {
+      iframe.contentWindow.history.forward();
+    }
+
+    function goHome() {
+      iframe.src = 'https://example.com';
+    }
+
+    function toggleDropdown() {
+      dropdown.classList.toggle('show');
+    }
+
+    function openSettings() {
+      ipcRenderer.send('navigate', 'settings.html');
+    }
+
+    function newTab() {
+      alert("New Tab (to be implemented with tabs)");
+      dropdown.classList.remove('show');
+    }
+
+    function newWindow() {
+      alert("New Window (handled by Electron or browser context)");
+      dropdown.classList.remove('show');
+    }
+
+    function newIncognito() {
+      alert("New Incognito Window (needs backend like Electron)");
+      dropdown.classList.remove('show');
+    }
+
+    // Hide dropdown when clicking outside
+    window.onclick = function(e) {
+      if (!e.target.closest('.menu-container')) {
+        dropdown.classList.remove('show');
+      }
+    }
+
+    // Load Lucide icons
+    lucide.createIcons();
+  </script>
 </body>
 </html>
