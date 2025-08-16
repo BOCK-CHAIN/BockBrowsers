@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browser Settings</title>
+  <!-- Lucide Icon Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Styles -->
+  <link rel="stylesheet" href="../styles/theme.css">
+  <link rel="stylesheet" href="../styles/settings.css">
+</head>
+<body>
+  <div class="sidebar" role="navigation" aria-label="Settings menu">
+    <h2>Settings</h2>
+    <input
+      type="search"
+      class="search-bar"
+      placeholder="Search settings..."
+      aria-label="Search settings"
+      oninput="filterMenu(this.value)"
+      autocomplete="off"
+    />
+    <button data-section="performance" class="active">
+      <i data-lucide="cpu"></i> Performance
+    </button>
+    <button data-section="search">
+      <i data-lucide="search"></i> Search Engine
+    </button>
+    <button data-section="appearance">
+      <i data-lucide="layout"></i> Appearance
+    </button>
+    <button data-section="languages">
+      <i data-lucide="globe"></i> Languages
+    </button>
+    <button data-section="download">
+      <i data-lucide="download"></i> Downloads
+    </button>
+    <button data-section="system">
+      <i data-lucide="hard-drive"></i> System
+    </button>
+    <button data-section="reset">
+      <i data-lucide="rotate-ccw"></i> Reset Settings
+    </button>
+    <button onclick="goHome()">Back</button>
+  </div>
+
+  <main class="content" role="main">
+    <section id="performance" class="section active" tabindex="0">
+      <h3>Performance</h3>
+      <p>Settings related to speed, memory usage, and efficiency.</p>
+      <form>
+        <label for="hardware-acceleration">Enable Hardware Acceleration</label>
+        <input type="checkbox" id="hardware-acceleration" name="hardware-acceleration" />
+        <label for="memory-limit">Memory Usage Limit (MB)</label>
+        <input type="text" id="memory-limit" name="memory-limit" placeholder="e.g. 2048" pattern="\d*" />
+      </form>
+    </section>
+
+    <section id="search" class="section" tabindex="0">
+      <h3>Search Engine</h3>
+      <p>Choose your default search engine.</p>
+      <form>
+        <label for="default-search">Default Search Engine</label>
+        <select id="default-search" name="default-search">
+          <option value="google" selected>Google</option>
+          <option value="bing">Bing</option>
+          <option value="duckduckgo">DuckDuckGo</option>
+          <option value="yahoo">Yahoo</option>
+        </select>
+      </form>
+    </section>
+
+    <section id="appearance" class="section" tabindex="0">
+      <h3>Appearance</h3>
+      <p>Change theme, font size, and other visuals.</p>
+      <form>
+        <label for="theme-toggle">Dark / Light Theme</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="theme-toggle" aria-checked="false" aria-label="Toggle dark or light theme">
+          <span class="slider"></span>
+        </label>
+        <label for="font-size">Font Size</label>
+        <select id="font-size" name="font-size">
+          <option value="small">Small</option>
+          <option value="medium" selected>Medium</option>
+          <option value="large">Large</option>
+        </select>
+      </form>
+    </section>
+
+    <section id="languages" class="section" tabindex="0">
+      <h3>Languages</h3>
+      <p>Select your preferred language.</p>
+      <form>
+        <label for="language-select">Preferred Language</label>
+        <select id="language-select" name="language-select">
+          <option value="en" selected>English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="zh">Chinese</option>
+        </select>
+      </form>
+    </section>
+
+    <section id="downloads" class="section" tabindex="0">
+      <h3>Downloads</h3>
+      <p>Manage download location and behavior.</p>
+      <form>
+        <label for="download-location">Download Location</label>
+        <input type="text" id="download-location" name="download-location" placeholder="e.g. C:\users\You\Downloads" />
+        <label>
+          <input type="checkbox" id="ask-location" name="ask-location" />
+          Always ask where to save files
+        </label>
+      </form>
+    </section>
+
+    <section id="system" class="section" tabindex="0">
+      <h3>System</h3>
+      <p>Control hardware acceleration and background processes.</p>
+      <form>
+        <label>
+          <input type="checkbox" id="background-updates" name="background-updates" />
+          Enable background updates
+        </label>
+      </form>
+    </section>
+
+    <section id="reset" class="section" tabindex="0">
+      <h3>Reset Settings</h3>
+      <p>Reset all browser settings to their default values.</p>
+      <button onclick="resetSettings()">Reset to Defaults</button>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="../scripts/settings.js"></script>
+</body>
+</html>

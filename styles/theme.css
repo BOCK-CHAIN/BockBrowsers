@@ -1,0 +1,119 @@
+/* Dark theme variables */
+:root {
+  /* General */
+  --bg-color: #0a0a0a;
+  --text-color: #e0d4f7;
+
+  /* Top bar (index.html) */
+  --topbar-bg: #2a003f;
+  --topbar-border: #4b0082;
+  --button-bg: #8000ff;
+  --button-hover-bg: #6200cc;
+  --button-text: #ffffff;
+  --input-bg: #1a001f;
+  --input-text: #e0d4f7;
+  --input-border: #a076ff;
+  --incognito-input-bg: #111111;
+  --incognito-input-text: #cccccc;
+
+  /* Tab bar */
+  --tabbar-bg: #1a001f;
+  --tabbar-border: #8000ff;
+  --tab-bg: #8000ff;
+  --tab-text: #ffffff;
+  --tab-active-bg: #6200cc;
+
+  /* Dropdown */
+  --dropdown-bg: #1a001f;
+  --dropdown-border: #8000ff;
+  --dropdown-text: #e0d4f7;
+  --dropdown-hover-bg: #32004d;
+
+  /* Incognito tab */
+  --incognito-tab-bg: #000000;
+  --incognito-tab-text: #bbbbbb;
+  --incognito-tab-border: #444444;
+  --incognito-tab-active-bg: #222222;
+  --incognito-tab-active-text: #ffffff;
+  --incognito-tab-active-border: #888888;
+
+  /* Settings sidebar */
+  --bg-sidebar: #1a001f;
+  --sidebar-header-bg: #2a003f;
+  --sidebar-divider: #32004d;
+  --sidebar-hover-bg: #32004d;
+  --sidebar-hover-text: #a076ff;
+  --sidebar-active-bg: #4b0082;
+  --sidebar-active-text: #d0b3ff;
+
+  /* Settings content */
+  --bg-content: #121014;
+  --heading-color: #a076ff;
+  --paragraph-color: #c9b8f7;
+
+  /* Toggles */
+  --toggle-on: #7b55ff;
+
+  /* Borders */
+  --border-color: #4b0082;
+}
+
+/* Light theme variables */
+body.light-theme {
+  /* General */
+  --bg-color: #f0f0f5;
+  --text-color: #2a003f;
+
+  /* Top bar */
+  --topbar-bg: #d6c8ff;
+  --topbar-border: #7b55ff;
+  --button-bg: #7b55ff;
+  --button-hover-bg: #5e3fd1;
+  --button-text: #ffffff;
+  --input-bg: #ffffff;
+  --input-text: #2a003f;
+  --input-border: #7b55ff;
+  --incognito-input-bg: #eeeeee;
+  --incognito-input-text: #555555;
+
+  /* Tab bar */
+  --tabbar-bg: #d6c8ff;
+  --tabbar-border: #7b55ff;
+  --tab-bg: #7b55ff;
+  --tab-text: #ffffff;
+  --tab-active-bg: #5e3fd1;
+
+  /* Dropdown */
+  --dropdown-bg: #ffffff;
+  --dropdown-border: #7b55ff;
+  --dropdown-text: #2a003f;
+  --dropdown-hover-bg: #d6c8ff;
+
+  /* Incognito tab */
+  --incognito-tab-bg: #eeeeee;
+  --incognito-tab-text: #555555;
+  --incognito-tab-border: #aaaaaa;
+  --incognito-tab-active-bg: #cccccc;
+  --incognito-tab-active-text: #000000;
+  --incognito-tab-active-border: #888888;
+
+  /* Settings sidebar */
+  --bg-sidebar: #b399ff;
+  --sidebar-header-bg: #9978ff;
+  --sidebar-divider: #a280ff;
+  --sidebar-hover-bg: #a280ff;
+  --sidebar-hover-text: #ffffff;
+  --sidebar-active-bg: #7b55ff;
+  --sidebar-active-text: #ffffff;
+
+  /* Settings content */
+  --bg-content: #ffffff;
+  --heading-color: #663399;
+  --paragraph-color: #4b3b7b;
+
+  /* Toggles */
+  --toggle-on: #7b55ff;
+
+  /* Borders */
+  --border-color: #7b55ff;
+}

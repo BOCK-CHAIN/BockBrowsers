@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Web Browser</title>
+  <!-- Lucide Icon Library -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <!-- Styles -->
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../styles/theme.css">
+
+  <!-- Firebase Auth Protection -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAvF5reoX4g2QkCGCdzj9dkCaV2ySEhSPI",
+      authDomain: "bockbrowserauth.firebaseapp.com",
+      projectId: "bockbrowserauth",
+      storageBucket: "bockbrowserauth.firebasestorage.app",
+      messagingSenderId: "1011597616469",
+      appId: "1:1011597616469:web:774f0658b7b23bce493bdc",
+      measurementId: "G-CL53BT0LNT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Redirect to login if not authenticated
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Optional: logout function
+    window.logout = () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    };
+  </script>
+</head>
+<body>
+  <div class="top-bar">
+    <button onclick="goBack()" aria-label="Go Back" class="accessible-button"><i data-lucide="arrow-left"></i></button>
+    <button onclick="goForward()" aria-label="Go Forward" class="accessible-button"><i data-lucide="arrow-right"></i></button>
+    <button onclick="goHome()" aria-label="Go Home" class="accessible-button"><i data-lucide="home"></i></button>
+    <input id="url" type="text" placeholder="Enter URL..." aria-label="URL input" />
+    <button onclick="loadURL()" aria-label="Load URL" class="accessible-button"><i data-lucide="globe"></i></button>
+    <div class="menu-container">
+      <button onclick="toggleDropdown()" aria-label="Open Menu" class="accessible-button"><i data-lucide="more-vertical"></i></button>
+      <div id="dropdown" class="dropdown">
+        <a href="#" onclick="newTab(); return false;">New Tab</a>
+        <a href="#" onclick="newWindow(); return false;">New Window</a>
+        <a href="#" onclick="newIncognito(); return false;">New Incognito Window</a>
+        <a href="#" onclick="openSettings(); return false;">Settings</a>
+        <a href="#" onclick="logout(); return false;">Logout</a> <!-- Added logout option -->
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-bar" class="tab-bar"></div>
+  <div id="webviews"></div>
+
+  <!-- Scripts -->
+  <script src="../scripts/ui/topbar.js"></script>
+  <script src="../scripts/ui/tabs.js"></script>
+  <script src="../scripts/main.js"></script>
+</body>
+</html>

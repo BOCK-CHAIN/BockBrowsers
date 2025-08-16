@@ -1,0 +1,35 @@
+{
+  "name": "bock_browser",
+  "version": "1.0.0",
+  "description": "A custom Electron-based web browser",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.bock.browser",
+    "productName": "Bock Browser",
+    "forceCodeSigning": false,
+    "files": [
+      "pages/**/*",
+      "styles/**/*",
+      "scripts/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false
+    }
+  },
+  "dependencies": {
+    "firebase": "^12.1.0"
+  }
+}

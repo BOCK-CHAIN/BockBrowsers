@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Bock Browser Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 80px;
+      background-color: #1e1e2f; /* dark background */
+      color: #ffffff;
+    }
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 250px;
+      border: none;
+      border-radius: 5px;
+      background: #2a2a3d;
+      color: white;
+    }
+    input::placeholder {
+      color: #bbbbbb;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4cafef; /* primary button */
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #368ad7;
+    }
+    #message {
+      margin-top: 10px;
+      color: #ff5555; /* error color */
+    }
+  </style>
+</head>
+<body>
+  <h2>Login to Bock Browser</h2>
+  
+  <input type="email" id="email" placeholder="Email" /><br>
+  <input type="password" id="password" placeholder="Password" /><br>
+  <button id="loginBtn">Login</button>
+  <button id="signupBtn">Sign Up</button>
+
+  <p id="message"></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAvF5reoX4g2QkCGCdzj9dkCaV2ySEhSPI",
+      authDomain: "bockbrowserauth.firebaseapp.com",
+      projectId: "bockbrowserauth",
+      storageBucket: "bockbrowserauth.firebasestorage.app",
+      messagingSenderId: "1011597616469",
+      appId: "1:1011597616469:web:774f0658b7b23bce493bdc",
+      measurementId: "G-CL53BT0LNT"
+    };
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const msg = document.getElementById("message");
+
+    // 🔹 Force sign-out every time app starts
+    signOut(auth).catch(() => {});
+
+    // Check if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user && window.location.pathname.endsWith("login.html")) {
+        window.location.href = "index.html";
+      }
+    });
+
+    // Login
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      if (!email || !password) {
+        msg.textContent = "Please fill out both fields.";
+        return;
+      }
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          msg.style.color = "lightgreen";
+          msg.textContent = "Login successful!";
+          setTimeout(() => window.location.href = "index.html", 1000);
+        })
+        .catch(err => {
+          msg.style.color = "red";
+          msg.textContent = err.message;
+        });
+    });
+
+    // Signup
+    document.getElementById("signupBtn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          msg.style.color = "lightgreen";
+          msg.textContent = "Account created! Please login.";
+        })
+        .catch(err => msg.textContent = err.message);
+    });
+  </script>
+</body>
+</html>
