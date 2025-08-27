@@ -4,7 +4,8 @@
   "description": "A custom Electron-based web browser",
   "main": "electron/main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron . --disable-features=Quic",
+    "server": "node server.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
@@ -23,6 +24,9 @@
       "electron/**/*",
       "package.json"
     ],
+    "asarUnpack": [
+      "**/node_modules/axios/**/*"
+    ],
     "win": {
       "target": "nsis",
       "icon": "assets/icon.ico",
@@ -30,6 +34,11 @@
     }
   },
   "dependencies": {
-    "firebase": "^12.1.0"
+    "@neondatabase/serverless": "^1.0.1",
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.1",
+    "firebase": "^12.1.0",
+    "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.0"
   }
 }
