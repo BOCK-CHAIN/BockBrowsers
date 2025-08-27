@@ -3,44 +3,123 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; script-src 'self' https://unpkg.com https://cdn.jsdelivr.net 'unsafe-inline' 'unsafe-eval'; style-src 'self' https://unpkg.com 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http://localhost:3000;"/>
   <title>Mini Web Browser</title>
   <!-- Lucide Icon Library -->
-  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Styles -->
   <link rel="stylesheet" href="../styles/base.css">
   <link rel="stylesheet" href="../styles/theme.css">
 
-  <!-- Firebase Auth Protection -->
+  <!-- Axios CDN for global availability -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" onerror="console.error('Failed to load Axios CDN');"></script>
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAvF5reoX4g2QkCGCdzj9dkCaV2ySEhSPI",
-      authDomain: "bockbrowserauth.firebaseapp.com",
-      projectId: "bockbrowserauth",
-      storageBucket: "bockbrowserauth.firebasestorage.app",
-      messagingSenderId: "1011597616469",
-      appId: "1:1011597616469:web:774f0658b7b23bce493bdc",
-      measurementId: "G-CL53BT0LNT"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    import { getUserSettings } from "../api.js"; // Import to check if user settings can be fetched
 
     // Redirect to login if not authenticated
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
-    });
+    window.addEventListener('DOMContentLoaded', async () => {
+      const jwtToken = localStorage.getItem('jwtToken');
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-    // Optional: logout function
-    window.logout = () => {
-      signOut(auth).then(() => {
+      // If no token or user info, redirect to login
+      if (!jwtToken || !currentUser.userId) {
         window.location.href = "login.html";
-      });
-    };
+        return;
+      }
+
+      // Optional: Verify token with backend (e.g., by trying to fetch settings)
+      try {
+        const userSettings = await getUserSettings(currentUser.userId);
+        if (userSettings === null) { // If settings come back null, token might be invalid/expired, or no settings exist
+          console.warn("No user settings found or invalid/expired session. Proceeding without settings.");
+          // Do NOT redirect to login.html here. Allow the page to load and assume default client-side behavior.
+          // The absence of settings will be handled by individual components.
+          window.defaultSearchEngine = 'google'; // Set a default if no settings are found.
+        } else {
+          // Apply user settings
+          if (userSettings && userSettings.defaultSearch) {
+            const urlInput = document.getElementById('url');
+            if (urlInput) {
+              // Set placeholder based on default search engine
+              if (userSettings.defaultSearch === 'google') {
+                urlInput.placeholder = 'Search Google or enter address';
+              } else if (userSettings.defaultSearch === 'bing') {
+                urlInput.placeholder = 'Search Bing or enter address';
+              } else if (userSettings.defaultSearch === 'duckduckgo') {
+                urlInput.placeholder = 'Search DuckDuckGo or enter address';
+              } else if (userSettings.defaultSearch === 'yahoo') {
+                urlInput.placeholder = 'Search Yahoo or enter address';
+              }
+              // You might also want to set a default search URL for 'loadURL' function if it exists
+              // For example: urlInput.dataset.searchEngine = userSettings.defaultSearch;
+            }
+          }
+          // Ensure window.defaultSearchEngine is set here, either from userSettings or a fallback
+          window.defaultSearchEngine = (userSettings && userSettings.defaultSearch) ? userSettings.defaultSearch : 'google';
+          console.log(`[index.html script] window.defaultSearchEngine set to: ${window.defaultSearchEngine}`);
+
+          // After settings are loaded, create the first tab and navigate home
+          if (window.createNewTab) {
+            window.createNewTab();
+            if (window.goHome) {
+              window.goHome();
+            }
+          }
+
+        }
+
+      } catch (error) {
+        console.error("Error verifying session or loading settings. Proceeding with default settings:", error);
+        // Do NOT redirect to login.html on settings load error.
+        // Allow the user to stay logged in, and handle settings defaults on the client-side.
+        window.defaultSearchEngine = 'google'; // Ensure a default is set if settings load fails.
+        // We will not return here, allowing the rest of the DOmContentLoaded to execute
+      }
+
+      // Listen for settings updates from the main process
+      if (window.electronAPI && window.electronAPI.onSettingsUpdate) {
+        window.electronAPI.onSettingsUpdate(() => {
+          console.log("Received settings update from main process. Reloading home page settings.");
+          // Reload only the parts of the settings that affect the home page
+          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (currentUser.userId) {
+            getUserSettings(currentUser.userId).then(userSettings => {
+              if (userSettings && userSettings.defaultSearch) {
+                const urlInput = document.getElementById('url');
+                if (urlInput) {
+                  // Update placeholder
+                  if (userSettings.defaultSearch === 'google') {
+                    urlInput.placeholder = 'Search Google or enter address';
+                  } else if (userSettings.defaultSearch === 'bing') {
+                    urlInput.placeholder = 'Search Bing or enter address';
+                  } else if (userSettings.defaultSearch === 'duckduckgo') {
+                    urlInput.placeholder = 'Search DuckDuckGo or enter address';
+                  } else if (userSettings.defaultSearch === 'yahoo') {
+                    urlInput.placeholder = 'Search Yahoo or enter address';
+                  }
+                  // Update the default search engine globally
+                  window.defaultSearchEngine = userSettings.defaultSearch;
+                  // Always call goHome to load the updated default search engine's home page
+                  if (window.goHome) {
+                    window.goHome();
+                  }
+                }
+              }
+            }).catch(error => {
+              console.error("Error reloading settings after update:", error);
+            });
+          }
+        });
+      }
+
+      // Logout function
+      window.logout = () => {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('currentUser');
+        window.location.href = "login.html";
+      };
+    });
   </script>
 </head>
 <body>
@@ -68,6 +147,54 @@
   <!-- Scripts -->
   <script src="../scripts/ui/topbar.js"></script>
   <script src="../scripts/ui/tabs.js"></script>
+  <script src="../scripts/navigation.js"></script>
   <script src="../scripts/main.js"></script>
+  <script>
+    // Ensure Lucide icons are created after all scripts are loaded
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+
+    // Global function to load URL from input bar
+    window.loadURL = function() {
+      const urlInput = document.getElementById('url');
+      if (urlInput && window.navigateTo) {
+        window.navigateTo(urlInput.value);
+      }
+    };
+
+    // Global function to create a new tab
+    window.newTab = function() {
+      if (window.createNewTab) {
+        window.createNewTab();
+      }
+    };
+
+    // Global function to open a new browser window
+    window.newWindow = function() {
+      if (window.electronAPI && window.electronAPI.openNewWindow) {
+        window.electronAPI.openNewWindow('index.html'); // Assuming index.html is the normal window
+      }
+    };
+
+    // Global function to open a new incognito window
+    window.newIncognito = function() {
+      if (window.electronAPI && window.electronAPI.openIncognitoWindow) {
+        window.electronAPI.openIncognitoWindow();
+      }
+    };
+
+    // Initialize a new normal tab on load
+    // window.addEventListener('DOMContentLoaded', () => {
+    //   if (window.createNewTab) {
+    //     window.createNewTab();
+    //     // Call goHome to load the default search engine on initial tab
+    //     if (window.goHome) {
+    //       window.goHome();
+    //     }
+    //   }
+    // });
+
+  </script>
 </body>
 </html>

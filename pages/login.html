@@ -52,68 +52,77 @@
 
   <p id="message"></p>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { loginUser, registerUser } from "../api.js";
 
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyAvF5reoX4g2QkCGCdzj9dkCaV2ySEhSPI",
-      authDomain: "bockbrowserauth.firebaseapp.com",
-      projectId: "bockbrowserauth",
-      storageBucket: "bockbrowserauth.firebasestorage.app",
-      messagingSenderId: "1011597616469",
-      appId: "1:1011597616469:web:774f0658b7b23bce493bdc",
-      measurementId: "G-CL53BT0LNT"
-    };
+const msg = document.getElementById("message");
 
-    // Init Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+// Force sign-out every time app starts
+// signOut(auth).catch(() => {});
 
-    const msg = document.getElementById("message");
+// Check if already logged in
+// onAuthStateChanged(auth, (user) => {
+//   if (user && window.location.pathname.endsWith("login.html")) {
+//     // Save user to localStorage
+//     localStorage.setItem('currentUser', JSON.stringify({
+//       uid: user.uid,
+//       email: user.email,
+//       displayName: user.displayName
+//     }));
+//     window.location.href = "index.html";
+//   }
+// });
 
-    // 🔹 Force sign-out every time app starts
-    signOut(auth).catch(() => {});
+// Login
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  if (!email || !password) {
+    msg.textContent = "Please fill out both fields.";
+    return;
+  }
+  try {
+    const response = await loginUser(email, password);
+    localStorage.setItem('jwtToken', response.token);
+    localStorage.setItem('currentUser', JSON.stringify({
+      userId: response.user.id,
+      email: response.user.email
+    }));
+    msg.style.color = "lightgreen";
+    msg.textContent = "Login successful!";
+    setTimeout(() => window.location.href = "index.html", 1000);
+  } catch (err) {
+    msg.style.color = "red";
+    msg.textContent = err.response ? err.response.data : err.message;
+  }
+});
 
-    // Check if already logged in
-    onAuthStateChanged(auth, (user) => {
-      if (user && window.location.pathname.endsWith("login.html")) {
-        window.location.href = "index.html";
-      }
-    });
-
-    // Login
-    document.getElementById("loginBtn").addEventListener("click", () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      if (!email || !password) {
-        msg.textContent = "Please fill out both fields.";
-        return;
-      }
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          msg.style.color = "lightgreen";
-          msg.textContent = "Login successful!";
-          setTimeout(() => window.location.href = "index.html", 1000);
-        })
-        .catch(err => {
-          msg.style.color = "red";
-          msg.textContent = err.message;
-        });
-    });
-
-    // Signup
-    document.getElementById("signupBtn").addEventListener("click", () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          msg.style.color = "lightgreen";
-          msg.textContent = "Account created! Please login.";
-        })
-        .catch(err => msg.textContent = err.message);
-    });
-  </script>
+// Signup
+document.getElementById("signupBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  if (!email || !password) {
+    msg.textContent = "Please fill out both fields.";
+    return;
+  }
+  try {
+    const registerResponse = await registerUser(email, password);
+    // Optionally, log in the user immediately after successful registration
+    const loginResponse = await loginUser(email, password);
+    localStorage.setItem('jwtToken', loginResponse.token);
+    localStorage.setItem('currentUser', JSON.stringify({
+      userId: loginResponse.user.id,
+      email: loginResponse.user.email
+    }));
+    msg.style.color = "lightgreen";
+    msg.textContent = "Account created and logged in!";
+    setTimeout(() => window.location.href = "index.html", 1000);
+  } catch (err) {
+    msg.style.color = "red";
+    msg.textContent = err.response ? err.response.data : err.message;
+  }
+});
+</script>
 </body>
 </html>

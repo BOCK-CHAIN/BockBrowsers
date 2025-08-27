@@ -2,32 +2,38 @@
 
 window.addEventListener('DOMContentLoaded', () => {
   // Load Lucide icons
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
 
   // URL bar: press Enter to load
-  document.getElementById('url').addEventListener('keydown', event => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      loadURL();
-    }
-  });
+  const urlInput = document.getElementById('url');
+  if (urlInput) {
+    urlInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        loadURL();
+      }
+    });
+  }
 
   // Menu actions
   window.newTab = () => {
-    createNewTab();
+    if (window.createNewTab) {
+      window.createNewTab();
+    }
     document.getElementById('dropdown').classList.remove('show');
   };
 
   window.newIncognito = () => {
-    createIncognitoTab();
-    document.getElementById('dropdown').classList.remove('show');
+    if (window.electronAPI && window.electronAPI.openNewWindow) {
+      window.electronAPI.openNewWindow(true); // Pass true for incognito
+      document.getElementById('dropdown').classList.remove('show');
+    } else {
+      alert('New incognito window function is not available.');
+    }
   };
 
   window.newWindow = () => {
     if (window.electronAPI && window.electronAPI.openNewWindow) {
-      window.electronAPI.openNewWindow();
+      window.electronAPI.openNewWindow(false); // Pass false for a regular new window
       document.getElementById('dropdown').classList.remove('show');
     } else {
       alert('New window function is not available.');
@@ -42,7 +48,4 @@ window.addEventListener('DOMContentLoaded', () => {
       alert('Settings function is not available.');
     }
   };
-
-  // Create the first default tab
-  createNewTab();
 });
