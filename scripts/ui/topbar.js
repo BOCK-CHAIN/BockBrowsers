@@ -2,7 +2,7 @@
 
 // Go back in current tab
 function goBack() {
-  const webview = document.getElementById(currentTabId);
+  const webview = document.getElementById(window.currentTabId) || document.getElementById('incognito-webview');
   if (webview && typeof webview.canGoBack === 'function' && webview.canGoBack()) {
     webview.goBack();
   }
@@ -10,7 +10,7 @@ function goBack() {
 
 // Go forward in current tab
 function goForward() {
-  const webview = document.getElementById(currentTabId);
+  const webview = document.getElementById(window.currentTabId) || document.getElementById('incognito-webview');
   if (webview && typeof webview.canGoForward === 'function' && webview.canGoForward()) {
     webview.goForward();
   }
@@ -18,9 +18,15 @@ function goForward() {
 
 // Go home (default URL)
 function goHome() {
-  const webview = document.getElementById(currentTabId);
+  const webview = document.getElementById(window.currentTabId) || document.getElementById('incognito-webview');
   if (webview) {
-    webview.src = 'https://duckduckgo.com';
+    const searchEngines = {
+      google: 'https://www.google.com',
+      bing: 'https://www.bing.com',
+      duckduckgo: 'https://duckduckgo.com',
+      yahoo: 'https://www.yahoo.com',
+    };
+    webview.src = searchEngines[window.defaultSearchEngine] || searchEngines.google; // Fallback to Google
   }
 }
 
@@ -30,21 +36,33 @@ function loadURL() {
   let url = urlInput.value.trim();
 
   if (!url) {
-    alert('Please enter a URL.');
-    return;
-  }
-  try {
-    if (!/^https?:\/\//i.test(url)) {
-      url = 'https://' + url;
-    }
-    const urlObj = new URL(url);
-    url = urlObj.href;
-  } catch (e) {
-    alert('Invalid URL entered.');
+    alert('Please enter a URL or search query.');
     return;
   }
 
-  const webview = document.getElementById(currentTabId);
+  // Check if it's a valid URL
+  let isValidUrl = false;
+  try {
+    const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
+    url = urlObj.href;
+    isValidUrl = true;
+  } catch (e) {
+    // Not a valid URL, treat as a search query
+    isValidUrl = false;
+  }
+
+  if (!isValidUrl) {
+    const query = encodeURIComponent(url);
+    const searchEngines = {
+      google: `https://www.google.com/search?q=${query}`,
+      bing: `https://www.bing.com/search?q=${query}`,
+      duckduckgo: `https://duckduckgo.com/?q=${query}`,
+      yahoo: `https://search.yahoo.com/search?q=${query}`,
+    };
+    url = searchEngines[window.defaultSearchEngine] || searchEngines.google; // Fallback to Google
+  }
+
+  const webview = document.getElementById(window.currentTabId) || document.getElementById('incognito-webview');
   if (webview) {
     console.log('Loading URL:', url);
     webview.src = url;
@@ -64,3 +82,10 @@ window.onclick = function (e) {
     document.getElementById('dropdown').classList.remove('show');
   }
 };
+
+// Expose functions globally for use in HTML
+window.goBack = goBack;
+window.goForward = goForward;
+window.goHome = goHome;
+window.loadURL = loadURL;
+window.toggleDropdown = toggleDropdown;

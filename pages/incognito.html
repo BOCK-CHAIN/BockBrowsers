@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; script-src 'self' https://unpkg.com https://cdn.jsdelivr.net 'unsafe-inline' 'unsafe-eval'; style-src 'self' https://unpkg.com 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http://localhost:3000;"/>
+  <title>Incognito Window</title>
+  <!-- Styles -->
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../styles/incognito.css">
+</head>
+<body>
+  <div class="top-bar">
+    <button onclick="goBack()" aria-label="Go Back" class="accessible-button"><i data-lucide="arrow-left"></i></button>
+    <button onclick="goForward()" aria-label="Go Forward" class="accessible-button"><i data-lucide="arrow-right"></i></button>
+    <button onclick="goHome()" aria-label="Go Home" class="accessible-button"><i data-lucide="home"></i></button>
+    <input id="url" type="text" placeholder="Enter URL..." aria-label="URL input" />
+    <button onclick="loadURL()" aria-label="Load URL" class="accessible-button"><i data-lucide="globe"></i></button>
+    <div class="menu-container">
+      <button onclick="toggleDropdown()" aria-label="Open Menu" class="accessible-button"><i data-lucide="more-vertical"></i></button>
+      <div id="dropdown" class="dropdown">
+        <a href="#" onclick="newTab(); return false;">New Tab</a>
+        <a href="#" onclick="newWindow(); return false;">New Window</a>
+        <a href="#" onclick="openSettings(); return false;">Settings</a>
+        <a href="#" onclick="logout(); return false;">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="tabs-container" class="tabs-container tab-bar">
+    <!-- Tab elements will be dynamically added here -->
+  </div>
+
+  <div id="webviews">
+    <!-- <webview id="incognito-webview" src="about:blank" style="width: 100%; height: 100%;" autosize="on"></webview> -->
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../scripts/ui/topbar.js"></script>
+  <script src="../scripts/main.js"></script>
+  <script src="../scripts/ui/tabs.js"></script>
+  <script src="../scripts/navigation.js"></script>
+  <script>
+    // Ensure Lucide icons are created after all scripts are loaded
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+
+    // Global function to load URL from input bar
+    window.loadURL = function() {
+      const urlInput = document.getElementById('url');
+      if (urlInput && window.navigateTo) {
+        window.navigateTo(urlInput.value);
+      }
+    };
+
+    // Global function to create a new incognito tab
+    window.newTab = function() {
+      if (window.createIncognitoTab) {
+        window.createIncognitoTab();
+      }
+    };
+
+    // Global function to open a new browser window
+    window.newWindow = function() {
+      if (window.electronAPI && window.electronAPI.openNewWindow) {
+        window.electronAPI.openNewWindow('index.html'); // Normal window
+      }
+    };
+
+    // Global function to open a new incognito window
+    window.newIncognito = function() {
+      if (window.electronAPI && window.electronAPI.openIncognitoWindow) {
+        window.electronAPI.openIncognitoWindow();
+      }
+    };
+
+    // Ensure defaultSearchEngine is set for incognito window (moved from module script)
+    if (!window.defaultSearchEngine) {
+      window.defaultSearchEngine; // Fallback handled by tabs.js
+    }
+
+    // Initialize a new incognito tab on load
+    window.addEventListener('DOMContentLoaded', () => {
+      window.createIncognitoTab();
+      if (window.goHome) {
+        window.goHome();
+      }
+    });
+
+    // Listen for settings updates from the main process
+    if (window.electronAPI && window.electronAPI.onSettingsUpdate) {
+      window.electronAPI.onSettingsUpdate(() => {
+        console.log("Received settings update from main process in incognito. Reloading home page settings.");
+        // The incognito window will pick up the default search engine from the main window
+        // or its own initial setting. Just calling goHome should apply the latest value.
+        if (window.goHome) {
+          window.goHome();
+        }
+      });
+    }
+  </script>
+  <script type="module">
+    // Original location of defaultSearchEngine assignment (now moved)
+    // if (!window.defaultSearchEngine) {
+    //   window.defaultSearchEngine; // Default to Google
+    // }
+  </script>
+</body>
+</html>

@@ -18,7 +18,6 @@ Bock Browser is a custom web browser built using Electron, providing a unique br
 *   **Electron:** For building the cross-platform desktop application.
 *   **Node.js:** Powers the backend server and API.
 *   **Neon Database (PostgreSQL):** Serverless SQL database for storing user data, sessions, and settings.
-*   **Firebase:** (Potentially for additional services like real-time updates or advanced authentication, although the current implementation uses JWTs and bcrypt for core auth. This can be clarified if Firebase is used for other specific features.)
 *   **Axios:** HTTP client for making API requests from the frontend to the backend.
 *   **bcrypt:** For secure password hashing.
 *   **jsonwebtoken (JWT):** For generating and verifying access tokens for authentication.
@@ -106,7 +105,6 @@ bock_browser/
 │   ├── login.html
 │   └── settings.html
 ├── scripts/                 # Frontend JavaScript files
-│   ├── firebase.js          # Firebase client-side integration (if used)
 │   ├── main.js              # Main frontend logic
 │   ├── navigation.js        # Handles in-app navigation
 │   ├── settings.js          # Logic for managing user settings
